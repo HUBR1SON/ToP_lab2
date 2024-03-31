@@ -10,6 +10,7 @@ public class Warrior{
 	private int damage;
 	private int damageRange;
 	private int walkRange;
+	private int effectedMoves = 0;
 	
 	Scanner keyb = new Scanner(System.in);
 	
@@ -21,30 +22,60 @@ public class Warrior{
 		this.name = name;
 	}
 	
-	public void walk(char[][] field, boolean isUsersMove)
+	public void compWalk(char[][] field)
 	{
 		int[] dir = new int[2];
-		if (isUsersMove)
+		dir[0] = this.getCoords()[0] - (int)(Math.random() * (this.getWalkRange()+1) );
+		dir[1] = this.getCoords()[1] + (int)(Math.random() * (2*this.getWalkRange()+1))-this.getWalkRange();
+		while (!(dir[0] >= 0 && dir[0] <= 8 && dir[1] <= 5 && dir[1] >= 0 && (field[dir[0]][dir[1]] == '*' || field[dir[0]][dir[1]] == '@')))
 		{
-			System.out.print("Координаты куда " + this.get_name() + " пойдёт: ");
-			dir[0] = keyb.nextInt(); dir[1] = keyb.nextInt();
-			while (!(dir[0] < 9 && dir[1] < 6 && Math.abs(this.get_coords()[0]-dir[0]) <= this.get_walkRange() && Math.abs(this.get_coords()[1]-dir[1]) <= this.get_walkRange() && field[dir[0]][dir[1]] == '*'))
-			{
-				System.out.println("Рекрут не может идти туда, милорд!");
-				System.out.print("Координаты куда " + this.get_name() + " пойдёт: ");
-				dir[0] = keyb.nextInt(); dir[1] = keyb.nextInt();
-			}
+			dir[0] = this.getCoords()[0] - (int)(Math.random() * (this.getWalkRange()+1) );
+			dir[1] = this.getCoords()[1] + (int)(Math.random() * (2*this.getWalkRange()+1))-this.getWalkRange();
 		}
-		else  // computer's move
+		System.out.println(this.getName()+" moved to "+dir[0]+" "+dir[1]);
+		
+		this.effectedMoves -= 1;
+		if (field[dir[0]][dir[1]] == '@')
 		{
-			dir[0] = this.get_coords()[0] - (int)(Math.random() * (this.get_walkRange()+1) );
-			dir[1] = this.get_coords()[1] + (int)(Math.random() * (2*this.get_walkRange()+1))-this.get_walkRange();
-			while (!(dir[0] >= 0 && dir[0] <= 8 && dir[1] <= 5 && dir[1] >= 0 && (field[dir[0]][dir[1]] == '*')))
+			this.setWalkRange(this.getWalkRange()-1);
+			this.effectedMoves = 1;
+		}
+		if (this.effectedMoves == 0)
+		{
+			this.setWalkRange(this.getWalkRange()+1);
+		}
+		field[this.getCoords()[0]][this.getCoords()[1]] = '*';
+		this.coords = dir.clone();
+		field[this.getCoords()[0]][this.getCoords()[1]] = this.name;
+	}
+	
+	public void walk(char[][] field)
+	{
+		
+		int[] dir = new int[2];
+		System.out.print("Координаты куда " + this.getName() + " пойдёт: ");
+		dir[0] = keyb.nextInt(); dir[1] = keyb.nextInt();
+		while (!(dir[0] < 9 && dir[1] < 6 && Math.abs(this.getCoords()[0]-dir[0]) <= this.getWalkRange() && Math.abs(this.getCoords()[1]-dir[1]) <= this.getWalkRange() && (field[dir[0]][dir[1]] == '*' || field[dir[0]][dir[1]] == '@')))
+		{
+			System.out.println("Рекрут не может идти туда, милорд!");
+			if (this.getWalkRange() == 0)
 			{
-				dir[0] = this.get_coords()[0] - (int)(Math.random() * (this.get_walkRange()+1) );
-				dir[1] = this.get_coords()[1] + (int)(Math.random() * (2*this.get_walkRange()+1))-this.get_walkRange();
+				this.setWalkRange(1);
+				return;
 			}
-			System.out.println(this.get_name()+" moved to "+dir[0]+" "+dir[1]);
+			System.out.print("Координаты куда " + this.getName() + " пойдёт: ");
+			dir[0] = keyb.nextInt(); dir[1] = keyb.nextInt();
+		}
+
+		this.effectedMoves -= 1;
+		if (field[dir[0]][dir[1]] == '@')
+		{
+			this.setWalkRange(this.getWalkRange()-1);
+			this.effectedMoves = 1;
+		}
+		if (this.effectedMoves == 0)
+		{
+			this.setWalkRange(this.getWalkRange()+1);
 		}
 		field[this.coords[0]][this.coords[1]] = '*';
 		this.coords = dir.clone();
@@ -53,51 +84,62 @@ public class Warrior{
 	
 	public void attack(char[][] field, Warrior enemy)
 	{
-		if (Math.abs(this.get_coords()[0] - enemy.get_coords()[0]) <= this.get_damageRange() && Math.abs(this.get_coords()[1] - enemy.get_coords()[1]) <= this.get_damageRange())
+		if (Math.abs(this.getCoords()[0] - enemy.getCoords()[0]) <= this.getDamageRange() && Math.abs(this.getCoords()[1] - enemy.getCoords()[1]) <= this.getDamageRange())
 		{
-			enemy.set_hp(enemy.get_hp() - this.get_damage());
-			System.out.println(enemy.get_name()+" get damaged for "+this.get_damage()+" DPM");
+			enemy.setHp(enemy.getHp() - this.getDamage());
+			System.out.println(enemy.getName()+" get damaged for "+this.getDamage()+" DPM");
 		}
 		else
-		System.out.println("Рекрут "+this.get_name()+" промахнулся! Слишком далеко!");
+		System.out.println("Рекрут "+this.getName()+" промахнулся! Слишком далеко!");
 	}
 	
-	public char get_name()
+	public char getName()
 	{
 		return this.name;
 	}
 	
-	public int[] get_coords()
+	public int[] getCoords()
 	{
 		return this.coords;
 	}
 	
-	public int get_walkRange()
+	public void setCoords(int x, int y)
+	{
+		this.coords[0] = x;
+		this.coords[1] = y;
+	}
+	
+	public int getWalkRange()
 	{
 		return this.walkRange;
 	}
 	
-	public int get_hp()
+	public void setWalkRange(int new_walkRange)
+	{
+		this.walkRange = new_walkRange;
+	}
+	
+	public int getHp()
 	{
 		return this.hp;
 	}
 	
-	public void set_hp(int new_hp)
+	public void setHp(int new_hp)
 	{
 		this.hp = new_hp;
 	}
 	
-	public int get_arm()
+	public int getArm()
 	{
 		return this.arm;
 	}
 	
-	public int get_damage()
+	public int getDamage()
 	{
 		return this.damage;
 	}
 	
-	public int get_damageRange()
+	public int getDamageRange()
 	{
 		return this.damageRange;
 	}

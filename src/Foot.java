@@ -15,35 +15,41 @@ public class Foot extends Warrior{
 			this.arm = 2;
 		}
 		this.hp += this.arm;
+
 	}
 
 	
-	public int get_walkRange()
+	public int getWalkRange()
 	{
 		return this.walkRange;
 	}
 	
-	public int get_hp()
+	public void setWalkRange(int new_walkRange)
+	{
+		this.walkRange = new_walkRange;
+	}
+	
+	public int getHp()
 	{
 		return this.hp;
 	}
 	
-	public void set_hp(int new_hp)
+	public void setHp(int new_hp)
 	{
 		this.hp = new_hp;
 	}
 	
-	public int get_arm()
+	public int getArm()
 	{
 		return this.arm;
 	}
 	
-	public int get_damage()
+	public int getDamage()
 	{
 		return this.damage;
 	}
 	
-	public int get_damageRange()
+	public int getDamageRange()
 	{
 		return this.damageRange;
 	}

@@ -10,48 +10,49 @@ public class Game
 	public Scanner keyb = new Scanner(System.in);
 	private boolean gameover = false;
 	ArrayList<Warrior> units = new ArrayList<Warrior>();
+	Wizard wizard = new Wizard((int)(Math.random()*9), (int)(Math.random()*6));
 	public char[][] field = {{'*','*','*','*','*','*'},
 					   		 {'*','*','*','*','#','#'},
-							 {'*','*','*','*','#','*'},
+							 {'@','*','*','*','#','*'},
 							 {'*','*','*','*','*','*'},
-							 {'*','*','*','*','*','*'},
+							 {'@','@','@','@','@','@'},
 							 {'*','*','*','#','#','*'},
 							 {'*','*','*','*','*','*'},
-							 {'*','*','*','*','*','*'},
+							 {'*','*','*','@','*','*'},
 							 {'*','*','*','*','*','*'}};
 	
 	
-	public int isGameover()
+	public int isGameOver()
 	{
 		int count = 0;
 		for(int i = 0; i < 3; i++)
-			if (this.units.get(i).get_hp() <= 0)
+			if (this.units.get(i).getHp() <= 0)
 				count += 1;
 		if (count == 3)
 			return -1;  // player lose
 		
 		count = 0;
 		for(int i = 3; i < 6; i++)
-			if (this.units.get(i).get_hp() <= 0)
+			if (this.units.get(i).getHp() <= 0)
 				count += 1;
 		if (count == 3)
 			return 1;  // computer lose
-		return 0;  // game is not over;
+		return 0;  // game is not over
 	}
 	
-	public void game_greeting()
+	public void gameGreeting()
 	{
 		System.out.println("Приветствую тебя, государь! На твою землю ступили чужестранцы!");
 		System.out.println("Защити свой народ, свою землю и честь любой ценой!");
 		System.out.println("В казне осталось 50 золотых. Цены на войнов таковы:");
-		System.out.println("мечник - 10 зол.(10HP/5 5D)		топорщик - 15 зол.(10HP/5 10Dam)");
-		System.out.println("лучник - 15	зол.(10HP/5 5Dam)	арбалетчик - 20");
-		System.out.println("всадник (меч) - 20		всадник (лук) - 25");
-		this.buy_units();
-		this.spawn_enemies();
+		System.out.println("мечник - 10 зол.(10HP/5 5D/2ran 1Wran)		топорщик - 15 зол.(10HP/5 10Dam/2ran 1Wran)");
+		System.out.println("лучник - 15	зол.(10HP/5 5Dam/3ran 2Wran)	арбалетчик - 20 зол.(10HP/5 5Dam/4ran 2Wran");
+		System.out.println("всадник (меч) - 20 зол.(15HP/3 5Dam/3ran 4Wran)		всадник (лук) - 25 зол.(15HP/3 5Dam/4ran 4Wran)	");
+		this.buyUnits();
+		this.spawnEnemies();
 	}
 	
-	public void buy_units()
+	public void buyUnits()
 	{
 		Map<String,Integer> unit_costs = new HashMap<String,Integer>();
 		unit_costs.put("f1", 10); unit_costs.put("f2", 15); unit_costs.put("a1", 15);
@@ -105,40 +106,72 @@ public class Game
 	}
 	
 	
-	public void computer_move()
+	public void computerMove()
 	{
 		Warrior unit = this.units.get((int)(Math.random() * 3) + 3);
-		while (unit.get_hp() <= 0)
+		Warrior unitToAttack;
+		int minDistance;
+		int minDistId = -1;
+		while (unit.getHp() <= 0)
 			unit = this.units.get((int)(Math.random() * 3) + 3);
-		int typeOfMove = (int)(Math.random() * 2);
-		if (typeOfMove == 1)
-			unit.walk(this.field, false);
+
+		minDistance = (int)(Math.pow(this.field.length, 2) + Math.pow(this.field.length, 2));
+		for (int i = 0; i < 3; i++)
+		{
+			if (this.units.get(i).getHp() <= 0)
+				continue;
+			if (minDistance > (int)(Math.pow(this.units.get(i).getCoords()[0] - unit.getCoords()[0], 2) + Math.pow(this.units.get(i).getCoords()[1] - unit.getCoords()[1], 2)))
+			{
+				minDistId = i;
+				minDistance = (int)(Math.pow(this.units.get(i).getCoords()[0] - unit.getCoords()[0], 2) + Math.pow(this.units.get(i).getCoords()[1] - unit.getCoords()[1], 2));
+			}
+		}
+		if ((this.units.get(minDistId).getCoords()[0] <= unit.getCoords()[0]+unit.getDamageRange()) && (this.units.get(minDistId).getCoords()[0] >= unit.getCoords()[0]-unit.getDamageRange()) && (this.units.get(minDistId).getCoords()[1] <= unit.getCoords()[1]+unit.getDamageRange()) && (this.units.get(minDistId).getCoords()[1] >= unit.getCoords()[1]-unit.getDamageRange()))
+		{
+			unitToAttack = this.units.get(minDistId);
+			unit.attack(this.field, unitToAttack);
+		}
 		else
-			unit.attack(this.field, this.units.get((int)(Math.random() * 3)));
+			unit.compWalk(this.field);
+
 	}
 	
-	public void spawn_enemies()
+	public void wizardMove()
+	{
+		switch ((int)(Math.random()*2))
+		{
+		case 0:
+			wizard.wizardWalk(field);
+			break;
+		case 1:
+			wizard.wizardThrow(this.units);
+			break;
+		}
+		wizard.poisonDamage(units);
+	}
+	
+	public void spawnEnemies()
 	{
 		int [] coords = new int[2];
 		int type;
 		int i = 0;
 		char[] names = {'a', 'b', 'c'};
-		boolean pos_is_occuped = true;
+		boolean posIsOccuped = true;
 		while(i < 3)
 		{
 			type = (int)(Math.random() * 2) + 1;
-			while (pos_is_occuped)
+			while (posIsOccuped)
 			{
 				coords[0] = (int)(Math.random() * 3) + 5;
 				coords[1] = (int)(Math.random() * 6);
-				pos_is_occuped = false;
+				posIsOccuped = false;
 				for (int j = 3; j < this.units.size(); j++)
 				{
-					if (this.units.get(j).get_coords()[0] == coords[0] && this.units.get(j).get_coords()[1] == coords[1])
-						pos_is_occuped = true;
+					if (this.units.get(j).getCoords()[0] == coords[0] && this.units.get(j).getCoords()[1] == coords[1])
+						posIsOccuped = true;
 				}
 			}
-			pos_is_occuped = true;
+			posIsOccuped = true;
 			switch ((int)(Math.random() * 3) + 1)
 			{
 			case 1:
@@ -158,22 +191,25 @@ public class Game
 		}
 	}
 	
-	public void update_field()
+	public void updateField()
 	{	
 		Warrior unit;
 		int [] coords;
 		for (int i = 0; i < this.units.size(); i++)
 		{
 			unit = this.units.get(i);
-			coords = unit.get_coords();
-			if (unit.get_hp() > 0)
-				this.field[coords[0]][coords[1]] = unit.get_name();
+			coords = unit.getCoords();
+			if (unit.getHp() > 0)
+				this.field[coords[0]][coords[1]] = unit.getName();
 			else
-				this.field[coords[0]][coords[1]] = '*';
+				this.field[coords[0]][coords[1]] = 'x';
 		}
+		unit = this.wizard;
+		coords = unit.getCoords();
+		this.field[coords[0]][coords[1]] = unit.getName();
 	}
 	
-	public void print_field()
+	public void printField()
 	{
 		for (int i = 0; i < this.field.length; i++)
 		{
@@ -189,13 +225,12 @@ public class Game
 		System.out.println("    0 1 2 3 4 5");
 	}
 	
-	public void make_move()
+	public void makeMove()
 	{
 		Map<Character,Integer> units = new HashMap<Character,Integer>();
 		units.put('1', 0); units.put('2', 1); units.put('3', 2); units.put('a', 3); units.put('b', 4); units.put('c', 5); 
 		int unit;
 		char action;
-		boolean isMoved = false;
 		char enemyName;
 		
 		System.out.print("Действие рекрута [a - attack][w - walk][i - info]: ");
@@ -203,11 +238,11 @@ public class Game
 		while ((action != 'a' && action != 'w') || action == 'i')
 		{
 			if (action == 'i')
-				this.show_info();
+				this.showInfo();
 			System.out.print("Корректное действие рекрута [a - attack][w - walk][i - info]: ");
 			action = keyb.next().charAt(0);
 		}
-		this.print_field();
+		this.printField();
 		System.out.print("Имя рекрута для приказа: ");
 		unit = keyb.nextInt();
 		while (unit != 1 && unit != 2 && unit != 3)
@@ -215,13 +250,13 @@ public class Game
 			System.out.print("Корректное имя рекрута для приказа: ");
 			unit = keyb.nextInt();
 		}
-		while (this.units.get(unit-1).get_hp() <= 0)
+		while (this.units.get(unit-1).getHp() <= 0)
 		{
 			System.out.print("Корректное имя рекрута для приказа: ");
 			unit = keyb.nextInt();
 		}
 		if (action == 'w')
-			this.units.get(unit-1).walk(this.field, true);
+			this.units.get(unit-1).walk(this.field);
 		if (action == 'a')
 		{	
 			System.out.print("Имя цели для атаки: ");
@@ -230,16 +265,16 @@ public class Game
 		}
 	}
 	
-	public void show_info()
+	public void showInfo()
 	{
 		Warrior unit;
 		for (int i = 0; i < this.units.size(); i++)
 		{
 			unit = this.units.get(i);
-			if (unit.get_hp() > 0)
-			System.out.println(unit.get_name()+": "+unit.get_hp()+"HP+ARM "+unit.get_damage()+"DPM "+unit.get_damageRange()+"DFor "+unit.get_walkRange()+"WFor");
+			if (unit.getHp() > 0)
+			System.out.println(unit.getName()+": "+unit.getHp()+"HP+ARM "+unit.getDamage()+"DPM "+unit.getDamageRange()+"DFor "+unit.getWalkRange()+"WFor");
 			else
-			System.out.println(unit.get_name()+" is DEAD");
+			System.out.println(unit.getName()+" is DEAD");
 		}
 	}
 }

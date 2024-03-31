@@ -2,21 +2,23 @@
 public class main {
 	public static void main(String args[]) {
 		Game game = new Game();
-		game.game_greeting();
-		game.update_field();
-		game.print_field();
+		game.gameGreeting();
+		game.updateField();
+		game.printField();
 		while (true)
 		{
-			game.make_move();
-			if (game.isGameover() == 1)
+			game.makeMove();
+			if (game.isGameOver() == 1)
 			{
 				System.out.println("You Win!");
 				break;
 			}
-			game.computer_move();
-			game.update_field();
-			game.print_field();
-			if (game.isGameover() == -1)
+			game.computerMove();
+			game.updateField();
+			game.wizardMove();
+			game.updateField();
+			game.printField();
+			if (game.isGameOver() == -1)
 			{
 				System.out.println("You Lose!");
 				break;

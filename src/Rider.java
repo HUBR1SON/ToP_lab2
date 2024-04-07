@@ -1,51 +1,18 @@
 
 public class Rider extends Warrior {
-	int hp = 15; int arm = 3; int damage = 5; int damageRange; int walkRange = 3;
 	
 	public Rider(int x, int y, int type, char name) {
 		super(x, y, type, name);
 		if (type == 1)
 			this.damageRange = 3;  
 		else
-			this.damageRange = 4;  
+			this.damageRange = 4; 
+		this.hp = 15;
+		this.arm = 3;
+		this.damage = 5;
+		this.walkRange = 3;
 		this.hp += this.arm;
-
 	}
 	
-	public int getWalkRange()
-	{
-		return this.walkRange;
-	}
 	
-	public void setWalkRange(int new_walkRange)
-	{
-		this.walkRange = new_walkRange;
-	}
-	
-	public int getHp()
-	{
-		return this.hp;
-	}
-	
-	public void setHp(int new_hp)
-	{
-		this.hp = new_hp;
-	}
-	
-	public int getArm()
-	{
-		return this.arm;
-	}
-	
-	public int getDamage()
-	{
-		return this.damage;
-	}
-	
-	public int getDamageRange()
-	{
-		return this.damageRange;
-	}
-	
-
 }

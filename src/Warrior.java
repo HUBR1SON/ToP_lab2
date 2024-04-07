@@ -3,14 +3,14 @@ import java.util.concurrent.TimeUnit;
 
 public class Warrior{
 	private int[] coords = new int[2];
-	private int type;
-	private char name;
-	private int hp;
-	private int arm;
-	private int damage;
-	private int damageRange;
-	private int walkRange;
-	private int effectedMoves = 0;
+	protected int type;
+	protected char name;
+	protected int hp;
+	protected int arm;
+	protected int damage;
+	protected int damageRange;
+	protected int walkRange;
+	protected int effectedMoves = 0;
 	
 	Scanner keyb = new Scanner(System.in);
 	
@@ -114,9 +114,9 @@ public class Warrior{
 		return this.walkRange;
 	}
 	
-	public void setWalkRange(int new_walkRange)
+	public void setWalkRange(int walkRange)
 	{
-		this.walkRange = new_walkRange;
+		this.walkRange = walkRange;
 	}
 	
 	public int getHp()
@@ -124,14 +124,14 @@ public class Warrior{
 		return this.hp;
 	}
 	
-	public void setHp(int new_hp)
+	public void setHp(int hp)
 	{
-		this.hp = new_hp;
+		this.hp = hp;
 	}
 	
 	public int getArm()
 	{
-		return this.arm;
+		return arm;
 	}
 	
 	public int getDamage()

@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 
 public class Wizard extends Warrior{
-	private int walkRange = 1;
-	private int damage = 1;
-	private int damageRange = 3;
+
 	private int [] damageList = new int[6];
 	
 	public Wizard(int x, int y)
 	{
 		super(x, y, -1, 'w');
+		this.walkRange = 1;
+		this.damage = 1;
+		this.damageRange = 3;
 		
 	}
 	
@@ -66,19 +67,5 @@ public class Wizard extends Warrior{
 		}
 	}
 	
-	public int getWalkRange()
-	{
-		return this.walkRange;
-	}
-	
-	public int getDamageRange()
-	{
-		return this.damageRange;
-	}
-	
-	public int getDamage()
-	{
-		return this.damage;
-	}
 }
 
